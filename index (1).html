@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Road Trip">
+<meta name="theme-color" content="#00653B">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="apple-touch-icon.png">
+<title>Road Trip English</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#00653B; --green-dk:#004F2E; --white:#FFFFFF; --yellow:#F6C343; --yellow-dk:#D9A71F;
+  --blue:#1B4A95; --red:#B8202E; --ok:#1E7A3C;
+  --bg:#E8EAE5; --surface:#FFFFFF; --text:#26292C; --muted:#5B6166; --line:#C9CDC6; --road:#3A3E42; --soft:#F3F4F1;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1D2023; --surface:#2A2E32; --text:#EEF0EC; --muted:#A3AAA6; --line:#3E4449; --road:#4A4F54; --soft:#24282B;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1D2023; --surface:#2A2E32; --text:#EEF0EC; --muted:#A3AAA6; --line:#3E4449; --road:#4A4F54; --soft:#24282B;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--text);font-family:"Overpass",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.45;-webkit-font-smoothing:antialiased}
+main{max-width:520px;margin:0 auto;padding:16px 16px 40px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+h1,h2,h3{margin:0;line-height:1.15}
+p{margin:0}
+
+/* The road sign: the one bold element */
+.sign{background:var(--green);border-radius:18px;padding:6px;color:var(--white);box-shadow:0 2px 0 var(--green-dk)}
+.sign-in{border:3px solid var(--white);border-radius:13px;padding:18px 18px 16px}
+.sign .small{font-weight:600;font-size:15px;opacity:.92}
+.sign .big{font-weight:800;font-size:44px;letter-spacing:.5px;line-height:1.05;margin-top:4px;word-break:break-word}
+.sign .mid{font-weight:600;font-size:22px;margin-top:6px}
+.sign-row{display:flex;align-items:center;gap:14px}
+.shield{width:54px;height:58px;flex:0 0 auto}
+
+.road{position:relative;height:26px;background:var(--road);border-radius:6px;margin:18px 0 6px;overflow:visible}
+.road::after{content:"";position:absolute;left:8px;right:8px;top:12px;height:2px;background:repeating-linear-gradient(90deg,var(--yellow) 0 12px,transparent 12px 22px)}
+.road .tick{position:absolute;top:-4px;width:2px;height:34px;background:var(--line);opacity:.9}
+.road .car{position:absolute;top:-4px;font-size:24px;transform:translateX(50%);transition:right .6s ease;z-index:2}
+.road-labels{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);font-weight:600}
+
+.streak{display:flex;gap:10px;align-items:baseline;margin:18px 0 6px}
+.streak b{font-size:28px;font-weight:800}
+.plan{color:var(--muted);margin-bottom:16px}
+
+.btn{display:block;width:100%;border:0;border-radius:12px;padding:16px 18px;font-weight:800;font-size:19px;text-align:center}
+.btn-go{background:var(--yellow);color:#26292C;box-shadow:0 3px 0 var(--yellow-dk)}
+.btn-go:active{transform:translateY(2px);box-shadow:0 1px 0 var(--yellow-dk)}
+.btn-plain{background:var(--surface);border:2px solid var(--line);font-weight:600;font-size:17px}
+.btn[disabled]{opacity:.5;cursor:default}
+.links{display:flex;gap:10px;margin-top:14px}
+.links .btn{font-size:16px;padding:12px}
+
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.bar .x{background:none;border:0;font-size:15px;font-weight:600;color:var(--muted);padding:6px 4px}
+.mini-road{flex:1;height:10px;background:var(--road);border-radius:5px;position:relative;overflow:hidden}
+.mini-road i{position:absolute;right:0;top:0;bottom:0;background:var(--yellow);border-radius:5px;transition:width .3s}
+.bar .count{font-size:14px;color:var(--muted);font-weight:600;min-width:48px;text-align:right}
+
+.prompt{margin:18px 2px 10px;font-weight:600;color:var(--muted)}
+.opts{display:grid;gap:10px}
+.opt{background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:15px 16px;text-align:left;font-size:18px;font-weight:600;display:flex;gap:12px;align-items:center}
+.opt .k{font-size:13px;color:var(--muted);border:1.5px solid var(--line);border-radius:6px;min-width:24px;text-align:center;padding:1px 0}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--surface))}
+.opt.wrong{border-color:var(--red);background:color-mix(in srgb,var(--red) 12%,var(--surface))}
+
+.audio{display:inline-flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.pill{background:rgba(255,255,255,.16);border:2px solid rgba(255,255,255,.75);color:#fff;border-radius:999px;padding:7px 14px;font-weight:600;font-size:15px}
+.pill-dark{background:var(--soft);border:2px solid var(--line);color:var(--text);border-radius:999px;padding:5px 12px;font-weight:600;font-size:14px}
+.listen-big{display:block;margin:6px auto 4px;background:rgba(255,255,255,.14);border:3px solid #fff;color:#fff;border-radius:50%;width:112px;height:112px;font-size:44px}
+
+.panel{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:16px;margin-top:14px}
+.panel h3{font-size:20px;font-weight:800}
+.panel .pt{font-size:18px;margin-top:2px}
+.ex{margin-top:12px;padding-top:12px;border-top:1.5px dashed var(--line)}
+.ex .en{font-weight:600}
+.ex .tr{color:var(--muted);font-size:16px}
+.note{margin-top:12px;background:color-mix(in srgb,var(--yellow) 26%,var(--surface));border-left:5px solid var(--yellow);padding:10px 12px;border-radius:6px;font-size:15.5px}
+.verdict{font-weight:800;font-size:18px;margin-bottom:6px}
+.verdict.ok{color:var(--ok)} .verdict.no{color:var(--red)}
+
+input.type{width:100%;font:inherit;font-size:24px;font-weight:600;padding:14px 16px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--text);margin-top:14px}
+.hint{color:var(--muted);font-size:15px;margin-top:8px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+
+.page-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.page-h h2{font-size:26px;font-weight:800}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:12px 14px}
+.stat b{display:block;font-size:30px;font-weight:800;line-height:1.1}
+.stat span{font-size:14px;color:var(--muted)}
+.heat{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px}
+.heat i{aspect-ratio:1;border-radius:5px;background:var(--line);display:block}
+.heat i.p{background:color-mix(in srgb,var(--green) 40%,var(--surface))}
+.heat i.d{background:var(--green)}
+.legend{display:flex;gap:14px;font-size:13px;color:var(--muted);margin-top:8px;align-items:center}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block;vertical-align:-1px;margin-right:4px}
+.hard{margin:8px 0 0;padding:0;list-style:none}
+.hard li{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:16px}
+.hard li span{color:var(--muted)}
+textarea{width:100%;min-height:96px;font:14px/1.4 ui-monospace,Menlo,monospace;border-radius:10px;border:2px solid var(--line);background:var(--soft);color:var(--text);padding:10px;margin-top:10px}
+.seg{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.seg button{flex:1;min-width:56px;border:2px solid var(--line);background:var(--surface);border-radius:10px;padding:10px;font-weight:700}
+.seg button.on{background:var(--green);border-color:var(--green);color:#fff}
+select{width:100%;font:inherit;padding:10px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--text);margin-top:8px}
+.muted{color:var(--muted);font-size:15px}
+.warn{background:color-mix(in srgb,var(--red) 12%,var(--surface));border:2px solid var(--red);border-radius:12px;padding:10px 12px;font-size:15px;margin-bottom:12px}
+.toggle{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.toggle input{width:24px;height:24px;accent-color:var(--green)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<main id="app" aria-live="polite"></main>
+<script>
+/* ---------- Vocabulary: [english, português, classe, exemplo EN, exemplo PT, alerta?] ---------- */
+const WORDS=[
+["be","ser, estar","v","I am happy today.","Eu estou feliz hoje."],
+["have","ter","v","I have two brothers.","Eu tenho dois irmãos."],
+["do","fazer (tarefa, ação)","v","What do you do after school?","O que você faz depois da escola?","Make e do significam fazer. Do = realizar uma ação ou tarefa (do homework). Make = criar, produzir (make a cake)."],
+["say","dizer","v","What did she say?","O que ela disse?"],
+["go","ir","v","We go to school by bus.","Nós vamos para a escola de ônibus."],
+["get","conseguir, pegar, receber","v","Can you get my bag?","Você pode pegar minha mochila?"],
+["make","fazer (criar, produzir)","v","My mom makes great cakes.","Minha mãe faz bolos ótimos.","Make = criar ou produzir algo. Do = realizar uma tarefa."],
+["know","saber, conhecer","v","I know the answer.","Eu sei a resposta."],
+["think","pensar, achar","v","I think it is easy.","Eu acho que é fácil."],
+["take","levar, pegar","v","Take your umbrella.","Leve seu guarda-chuva."],
+["see","ver","v","I can see the sea.","Eu consigo ver o mar."],
+["come","vir","v","Come here, please.","Venha aqui, por favor."],
+["want","querer","v","I want some water.","Eu quero um pouco de água."],
+["look","olhar","v","Look at the sky!","Olhe para o céu!"],
+["use","usar","v","Can I use your pen?","Posso usar sua caneta?"],
+["find","encontrar, achar","v","I can't find my keys.","Não consigo achar minhas chaves."],
+["give","dar","v","Give me the ball.","Me dê a bola."],
+["tell","contar, dizer","v","Tell me a story.","Me conte uma história."],
+["work","trabalhar","v","My dad works every day.","Meu pai trabalha todo dia."],
+["call","ligar, chamar","v","Call me later.","Me liga mais tarde."],
+["try","tentar","v","Try again!","Tente de novo!"],
+["ask","perguntar, pedir","v","Ask the teacher.","Pergunte ao professor."],
+["need","precisar","v","I need help.","Eu preciso de ajuda."],
+["feel","sentir","v","I feel tired.","Eu me sinto cansado."],
+["leave","sair, deixar","v","We leave at seven.","Nós saímos às sete."],
+["put","colocar, pôr","v","Put the book on the table.","Coloque o livro na mesa."],
+["keep","manter, guardar","v","Keep calm.","Mantenha a calma."],
+["let","deixar, permitir","v","Let me help you.","Deixe-me ajudar você."],
+["begin","começar","v","The class begins at eight.","A aula começa às oito."],
+["help","ajudar","v","Can you help me?","Você pode me ajudar?"],
+["talk","conversar","v","We talk every day.","Nós conversamos todo dia."],
+["turn","virar, girar","v","Turn left here.","Vire à esquerda aqui."],
+["start","iniciar, começar","v","Let's start the game.","Vamos começar o jogo."],
+["show","mostrar","v","Show me your drawing.","Me mostre seu desenho."],
+["hear","ouvir","v","I can hear music.","Eu consigo ouvir música."],
+["play","jogar, brincar, tocar","v","We play soccer on Saturdays.","Nós jogamos futebol aos sábados."],
+["run","correr","v","I run in the park.","Eu corro no parque."],
+["move","mover, mudar-se","v","They move to a new house.","Eles se mudam para uma casa nova."],
+["live","morar, viver","v","I live near the beach.","Eu moro perto da praia."],
+["believe","acreditar","v","I believe you.","Eu acredito em você."],
+["bring","trazer","v","Bring your notebook.","Traga seu caderno."],
+["write","escrever","v","Write your name here.","Escreva seu nome aqui."],
+["sit","sentar","v","Sit down, please.","Sente-se, por favor."],
+["stand","ficar de pé","v","Stand in line.","Fique na fila."],
+["lose","perder","v","Don't lose your phone.","Não perca seu celular."],
+["pay","pagar","v","I pay for the ice cream.","Eu pago o sorvete."],
+["meet","conhecer (pessoa), encontrar-se","v","Nice to meet you.","Prazer em conhecer você."],
+["learn","aprender","v","I learn English at school.","Eu aprendo inglês na escola."],
+["change","mudar, trocar","v","Change your shirt.","Troque sua camisa."],
+["understand","entender","v","I don't understand.","Eu não entendo."],
+["watch","assistir","v","We watch movies on Friday.","Nós assistimos filmes na sexta."],
+["follow","seguir","v","Follow me.","Me siga."],
+["stop","parar","v","Stop the car!","Pare o carro!"],
+["read","ler","v","I read before bed.","Eu leio antes de dormir."],
+["speak","falar","v","Do you speak English?","Você fala inglês?"],
+["open","abrir","v","Open the door.","Abra a porta."],
+["close","fechar","v","Close the window.","Feche a janela."],
+["buy","comprar","v","I want to buy a new game.","Eu quero comprar um jogo novo."],
+["eat","comer","v","We eat lunch at noon.","Nós almoçamos ao meio-dia."],
+["drink","beber","v","Drink more water.","Beba mais água."],
+["sleep","dormir","v","I sleep eight hours.","Eu durmo oito horas."],
+["walk","andar, caminhar","v","I walk to school.","Eu vou a pé para a escola."],
+["wait","esperar (aguardar)","v","Wait for me!","Espere por mim!"],
+["love","amar, adorar","v","I love pizza.","Eu adoro pizza."],
+["like","gostar","v","I like dogs.","Eu gosto de cachorros."],
+["remember","lembrar","v","I remember your name.","Eu lembro do seu nome."],
+["forget","esquecer","v","Don't forget your homework.","Não esqueça seu dever de casa."],
+["win","ganhar, vencer","v","Our team wins!","Nosso time vence!"],
+["send","enviar, mandar","v","Send me a message.","Me mande uma mensagem."],
+["build","construir","v","They build a big house.","Eles constroem uma casa grande."],
+["finish","terminar","v","Finish your food.","Termine sua comida."],
+["study","estudar","v","I study math every day.","Eu estudo matemática todo dia."],
+["pull","puxar","v","Pull the door.","Puxe a porta.","Pull = puxar. Não confunda com push, que é empurrar."],
+["push","empurrar","v","Push the cart.","Empurre o carrinho.","Falso amigo: push parece puxar, mas significa empurrar."],
+["pretend","fingir","v","He pretends to sleep.","Ele finge que está dormindo.","Falso amigo: pretend = fingir. Pretender em inglês é intend."],
+["cook","cozinhar","v","My grandma cooks rice.","Minha avó cozinha arroz."],
+["draw","desenhar","v","I draw animals.","Eu desenho animais."],
+["sing","cantar","v","She sings very well.","Ela canta muito bem."],
+["swim","nadar","v","I swim in the pool.","Eu nado na piscina."],
+["fly","voar","v","Birds fly.","Pássaros voam."],
+["fall","cair","v","Leaves fall in autumn.","As folhas caem no outono."],
+["break","quebrar","v","Don't break the glass.","Não quebre o copo."],
+["carry","carregar","v","I carry my bag.","Eu carrego minha mochila."],
+["clean","limpar","v","Clean your room.","Limpe seu quarto."],
+["wash","lavar","v","Wash your hands.","Lave as mãos."],
+["choose","escolher","v","Choose a color.","Escolha uma cor."],
+["hope","ter esperança, torcer","v","I hope you win.","Espero que você ganhe."],
+["answer","responder","v","Answer the question.","Responda à pergunta."],
+["miss","sentir falta, perder (ônibus, aula)","v","I miss my friends.","Sinto falta dos meus amigos."],
+["laugh","rir","v","We laugh a lot.","Nós rimos muito."],
+["cry","chorar","v","The baby cries at night.","O bebê chora à noite."],
+["travel","viajar","v","We travel in July.","Nós viajamos em julho."],
+["grow","crescer","v","Plants grow fast.","As plantas crescem rápido."],
+["happen","acontecer","v","What happened?","O que aconteceu?"],
+["attend","frequentar, comparecer","v","I attend a good school.","Eu frequento uma boa escola.","Falso amigo: attend = frequentar ou comparecer. Atender (telefone) é answer."],
+["time","tempo, vez, hora","n","What time is it?","Que horas são?"],
+["year","ano","n","I am twelve years old.","Eu tenho doze anos."],
+["day","dia","n","Have a nice day!","Tenha um bom dia!"],
+["week","semana","n","See you next week.","Até a próxima semana."],
+["month","mês","n","My birthday is next month.","Meu aniversário é no mês que vem."],
+["people","pessoas","n","Many people live here.","Muitas pessoas moram aqui."],
+["man","homem","n","That man is my uncle.","Aquele homem é meu tio."],
+["woman","mulher","n","The woman is a doctor.","A mulher é médica."],
+["child","criança","n","The child is playing.","A criança está brincando."],
+["friend","amigo","n","He is my best friend.","Ele é meu melhor amigo."],
+["family","família","n","I love my family.","Eu amo minha família."],
+["mother","mãe","n","My mother is a teacher.","Minha mãe é professora."],
+["father","pai","n","My father likes soccer.","Meu pai gosta de futebol."],
+["brother","irmão","n","My brother is older than me.","Meu irmão é mais velho que eu."],
+["sister","irmã","n","My sister plays piano.","Minha irmã toca piano."],
+["parents","pais (pai e mãe)","n","My parents work a lot.","Meus pais trabalham muito.","Falso amigo: parents = pai e mãe. Parentes em inglês é relatives."],
+["house","casa (construção)","n","Their house is big.","A casa deles é grande."],
+["home","lar, casa","n","Let's go home.","Vamos para casa."],
+["school","escola","n","School starts in February.","A escola começa em fevereiro."],
+["teacher","professor","n","Our teacher is funny.","Nosso professor é engraçado."],
+["student","aluno","n","There are thirty students in my class.","Há trinta alunos na minha turma."],
+["class","aula, turma","n","The class is boring today.","A aula está chata hoje."],
+["book","livro","n","This book is great.","Este livro é ótimo."],
+["word","palavra","n","Learn a new word every day.","Aprenda uma palavra nova todo dia."],
+["question","pergunta","n","I have a question.","Eu tenho uma pergunta."],
+["name","nome","n","What is your name?","Qual é o seu nome?"],
+["water","água","n","The water is cold.","A água está fria."],
+["food","comida","n","I like Japanese food.","Eu gosto de comida japonesa."],
+["money","dinheiro","n","I save my money.","Eu guardo meu dinheiro."],
+["car","carro","n","My uncle has a red car.","Meu tio tem um carro vermelho."],
+["city","cidade","n","It is a big city.","É uma cidade grande."],
+["country","país","n","Brazil is a big country.","O Brasil é um país grande."],
+["world","mundo","n","I want to travel the world.","Eu quero viajar pelo mundo."],
+["game","jogo","n","This game is hard.","Este jogo é difícil."],
+["phone","celular, telefone","n","My phone is dead.","Meu celular descarregou."],
+["room","quarto, sala","n","My room is messy.","Meu quarto está bagunçado."],
+["door","porta","n","Someone is at the door.","Tem alguém na porta."],
+["window","janela","n","Open the window, please.","Abra a janela, por favor."],
+["table","mesa","n","The keys are on the table.","As chaves estão na mesa."],
+["chair","cadeira","n","Sit on this chair.","Sente nesta cadeira."],
+["bed","cama","n","Go to bed!","Vá para a cama!"],
+["dog","cachorro","n","My dog is very fast.","Meu cachorro é muito rápido."],
+["cat","gato","n","The cat sleeps all day.","O gato dorme o dia todo."],
+["bird","pássaro","n","A bird is on the tree.","Tem um pássaro na árvore."],
+["tree","árvore","n","That tree is very tall.","Aquela árvore é muito alta."],
+["sun","sol","n","The sun is hot today.","O sol está quente hoje."],
+["rain","chuva","n","I like the rain.","Eu gosto da chuva."],
+["sea","mar","n","The sea is blue.","O mar é azul."],
+["beach","praia","n","We go to the beach on Sunday.","Nós vamos à praia no domingo."],
+["street","rua","n","I live on this street.","Eu moro nesta rua."],
+["store","loja","n","The store opens at nine.","A loja abre às nove."],
+["hand","mão","n","Raise your hand.","Levante a mão."],
+["head","cabeça","n","My head hurts.","Minha cabeça dói."],
+["eye","olho","n","She has green eyes.","Ela tem olhos verdes."],
+["heart","coração","n","Your heart beats fast.","Seu coração bate rápido."],
+["body","corpo","n","Exercise is good for your body.","Exercício é bom para o seu corpo."],
+["part","parte","n","This is my favorite part.","Esta é minha parte favorita."],
+["place","lugar","n","This place is beautiful.","Este lugar é lindo."],
+["thing","coisa","n","I have many things to do.","Eu tenho muitas coisas para fazer."],
+["way","caminho, jeito","n","This is the way to the park.","Este é o caminho para o parque."],
+["life","vida","n","Life is good.","A vida é boa."],
+["job","emprego","n","My aunt has a new job.","Minha tia tem um emprego novo."],
+["idea","ideia","n","That's a good idea!","Que boa ideia!"],
+["problem","problema","n","No problem!","Sem problema!"],
+["story","história","n","This story is scary.","Esta história é assustadora."],
+["music","música","n","I listen to music every day.","Eu escuto música todo dia."],
+["movie","filme","n","Let's watch a movie.","Vamos assistir um filme."],
+["picture","foto, imagem","n","Take a picture!","Tire uma foto!"],
+["color","cor","n","Blue is my favorite color.","Azul é minha cor favorita."],
+["number","número","n","What's your phone number?","Qual é o número do seu celular?"],
+["morning","manhã","n","Good morning!","Bom dia!"],
+["night","noite","n","Good night!","Boa noite!"],
+["afternoon","tarde (período)","n","See you this afternoon.","Até hoje à tarde."],
+["today","hoje","adv","Today is Monday.","Hoje é segunda-feira."],
+["tomorrow","amanhã","adv","See you tomorrow!","Até amanhã!"],
+["yesterday","ontem","adv","I was sick yesterday.","Eu estava doente ontem."],
+["breakfast","café da manhã","n","I eat eggs for breakfast.","Eu como ovos no café da manhã."],
+["lunch","almoço","n","Lunch is ready.","O almoço está pronto."],
+["dinner","jantar","n","What's for dinner?","O que tem para o jantar?"],
+["homework","dever de casa","n","I finish my homework early.","Eu termino meu dever de casa cedo."],
+["test","prova, teste","n","I have a math test tomorrow.","Eu tenho prova de matemática amanhã."],
+["grade","nota, série escolar","n","I got a good grade.","Eu tirei uma boa nota."],
+["library","biblioteca","n","The library is quiet.","A biblioteca é silenciosa.","Falso amigo: library = biblioteca. Livraria em inglês é bookstore."],
+["college","faculdade","n","My cousin goes to college.","Meu primo faz faculdade.","Falso amigo: college = faculdade. Colégio em inglês é school."],
+["team","time, equipe","n","Our team is the best.","Nosso time é o melhor."],
+["ball","bola","n","Kick the ball!","Chute a bola!"],
+["shirt","camisa","n","I like your shirt.","Gostei da sua camisa."],
+["shoes","sapatos, tênis","n","Take off your shoes.","Tire os sapatos."],
+["bag","bolsa, mochila, sacola","n","My bag is heavy.","Minha mochila está pesada."],
+["key","chave","n","Where is the key?","Onde está a chave?"],
+["clock","relógio (de parede)","n","The clock is on the wall.","O relógio está na parede."],
+["computer","computador","n","I use the computer for school.","Eu uso o computador para a escola."],
+["bus","ônibus","n","The bus is late.","O ônibus está atrasado."],
+["kitchen","cozinha","n","Mom is in the kitchen.","A mamãe está na cozinha."],
+["bathroom","banheiro","n","Where is the bathroom?","Onde fica o banheiro?"],
+["floor","chão, andar","n","The floor is wet.","O chão está molhado."],
+["wall","parede, muro","n","Paint the wall.","Pinte a parede."],
+["fruit","fruta","n","I eat fruit every day.","Eu como fruta todo dia."],
+["apple","maçã","n","An apple a day is healthy.","Uma maçã por dia é saudável."],
+["bread","pão","n","I want bread with butter.","Quero pão com manteiga."],
+["milk","leite","n","Do you want milk?","Você quer leite?"],
+["egg","ovo","n","I can cook an egg.","Eu sei fazer um ovo."],
+["chicken","frango, galinha","n","We have chicken for lunch.","Temos frango no almoço."],
+["juice","suco","n","Orange juice, please.","Suco de laranja, por favor."],
+["meat","carne","n","He doesn't eat meat.","Ele não come carne."],
+["good","bom","adj","The food is good.","A comida está boa."],
+["bad","ruim, mau","adj","That was a bad day.","Foi um dia ruim."],
+["new","novo","adj","I have a new bike.","Eu tenho uma bicicleta nova."],
+["old","velho, antigo","adj","This house is very old.","Esta casa é muito antiga."],
+["big","grande","adj","That's a big dog!","Que cachorro grande!"],
+["small","pequeno","adj","My room is small.","Meu quarto é pequeno."],
+["long","longo, comprido","adj","Her hair is long.","O cabelo dela é comprido."],
+["short","curto, baixo","adj","He is short.","Ele é baixo."],
+["tall","alto (pessoa, prédio)","adj","My father is tall.","Meu pai é alto."],
+["high","alto (altura, nível)","adj","The wall is high.","O muro é alto."],
+["young","jovem","adj","My mom looks young.","Minha mãe parece jovem."],
+["happy","feliz","adj","She looks happy.","Ela parece feliz."],
+["sad","triste","adj","Why are you sad?","Por que você está triste?"],
+["easy","fácil","adj","The test was easy.","A prova foi fácil."],
+["hard","difícil, duro","adj","This question is hard.","Esta pergunta é difícil."],
+["important","importante","adj","Sleep is important.","O sono é importante."],
+["right","certo, direito","adj","You are right.","Você está certo."],
+["wrong","errado","adj","That answer is wrong.","Essa resposta está errada."],
+["same","mesmo, igual","adj","We have the same shoes.","Nós temos os mesmos sapatos."],
+["different","diferente","adj","Our ideas are different.","Nossas ideias são diferentes."],
+["hot","quente","adj","The soup is hot.","A sopa está quente."],
+["cold","frio","adj","It's cold outside.","Está frio lá fora."],
+["fast","rápido","adj","This car is fast.","Este carro é rápido."],
+["slow","lento, devagar","adj","The internet is slow.","A internet está lenta."],
+["beautiful","bonito, lindo","adj","What a beautiful day!","Que dia lindo!"],
+["funny","engraçado","adj","That video is funny.","Esse vídeo é engraçado."],
+["tired","cansado","adj","I'm tired after soccer.","Estou cansado depois do futebol."],
+["hungry","com fome","adj","I'm hungry.","Estou com fome."],
+["ready","pronto","adj","Are you ready?","Você está pronto?"],
+["free","livre, grátis","adj","The game is free.","O jogo é grátis."],
+["full","cheio","adj","The bus is full.","O ônibus está cheio."],
+["empty","vazio","adj","The box is empty.","A caixa está vazia."],
+["dirty","sujo","adj","My shoes are dirty.","Meus sapatos estão sujos."],
+["expensive","caro","adj","That phone is expensive.","Esse celular é caro."],
+["cheap","barato","adj","This shirt is cheap.","Esta camisa é barata."],
+["strong","forte","adj","He is very strong.","Ele é muito forte."],
+["favorite","favorito","adj","Pizza is my favorite food.","Pizza é minha comida favorita."],
+["best","o melhor","adj","You are the best!","Você é o melhor!"],
+["better","melhor (que outro)","adj","I feel better now.","Eu me sinto melhor agora."],
+["boring","chato, entediante","adj","The movie was boring.","O filme foi chato."],
+["scared","com medo","adj","I'm scared of spiders.","Tenho medo de aranhas."],
+["angry","bravo, com raiva","adj","Dad is angry.","O papai está bravo."],
+["sure","certo, com certeza","adj","Are you sure?","Você tem certeza?"],
+["actual","real, verdadeiro","adj","What is the actual price?","Qual é o preço real?","Falso amigo: actual = real, verdadeiro. Atual em inglês é current."],
+["sensible","sensato","adj","That's a sensible choice.","É uma escolha sensata.","Falso amigo: sensible = sensato. Sensível em inglês é sensitive."],
+["quiet","quieto, silencioso","adj","Please be quiet.","Por favor, fique quieto."],
+["loud","alto (som), barulhento","adj","The music is too loud.","A música está alta demais."],
+["early","cedo","adv","I wake up early.","Eu acordo cedo."],
+["late","tarde, atrasado","adj","Don't be late!","Não se atrase!"],
+["dangerous","perigoso","adj","That road is dangerous.","Essa estrada é perigosa."],
+["always","sempre","adv","I always brush my teeth.","Eu sempre escovo os dentes."],
+["never","nunca","adv","I never eat fish.","Eu nunca como peixe."],
+["sometimes","às vezes","adv","Sometimes I play video games.","Às vezes eu jogo videogame."],
+["often","frequentemente","adv","We often go to the beach.","Nós vamos à praia com frequência."],
+["usually","geralmente","adv","I usually sleep at ten.","Eu geralmente durmo às dez."],
+["again","de novo","adv","Say it again.","Diga de novo."],
+["now","agora","adv","Do it now!","Faça agora!"],
+["here","aqui","adv","I'm here!","Estou aqui!"],
+["there","lá, ali","adv","Put it there.","Coloque ali."],
+["very","muito","adv","It's very hot.","Está muito quente."],
+["too","também, demais","adv","I like it too.","Eu também gosto."],
+["also","também","adv","She also speaks Spanish.","Ela também fala espanhol."],
+["only","só, apenas","adv","I only have one pen.","Eu só tenho uma caneta."],
+["still","ainda","adv","Are you still hungry?","Você ainda está com fome?"],
+["already","já","adv","I already finished.","Eu já terminei."],
+["soon","logo, em breve","adv","See you soon!","Até logo!"],
+["together","juntos","adv","Let's study together.","Vamos estudar juntos."],
+["maybe","talvez","adv","Maybe tomorrow.","Talvez amanhã."],
+["really","realmente, mesmo","adv","Really?","Sério?"],
+["actually","na verdade","adv","Actually, I don't like it.","Na verdade, eu não gosto.","Falso amigo: actually = na verdade. Atualmente em inglês é nowadays."],
+["eventually","no fim, com o tempo","adv","Eventually, he found his dog.","No fim, ele achou o cachorro.","Falso amigo: eventually = no fim, com o tempo. Eventualmente em inglês é occasionally."],
+["because","porque","conj","I'm tired because I ran.","Estou cansado porque corri."],
+["but","mas","conj","I like it, but it's expensive.","Eu gosto, mas é caro."],
+["if","se","conj","If it rains, we stay home.","Se chover, ficamos em casa."],
+["when","quando","adv","When is your birthday?","Quando é seu aniversário?"],
+["where","onde","adv","Where do you live?","Onde você mora?"],
+["why","por quê","adv","Why are you late?","Por que você está atrasado?"],
+["how","como","adv","How are you?","Como você está?"],
+["what","o que, qual","pron","What is this?","O que é isto?"],
+["who","quem","pron","Who is that boy?","Quem é aquele menino?"],
+["which","qual (entre opções)","pron","Which color do you want?","Qual cor você quer?"],
+["everything","tudo","pron","Everything is fine.","Está tudo bem."],
+["something","algo, alguma coisa","pron","I want something to eat.","Quero algo para comer."],
+["nothing","nada","pron","There is nothing here.","Não tem nada aqui."],
+["someone","alguém","pron","Someone is calling you.","Alguém está te ligando."],
+["everyone","todo mundo","pron","Everyone likes pizza.","Todo mundo gosta de pizza."],
+["with","com","prep","Come with me.","Venha comigo."],
+["without","sem","prep","I can't live without music.","Não consigo viver sem música."],
+["before","antes","prep","Wash your hands before lunch.","Lave as mãos antes do almoço."],
+["after","depois","prep","Let's play after school.","Vamos jogar depois da aula."],
+["between","entre","prep","Sit between us.","Sente-se entre nós."],
+["near","perto","prep","The school is near my house.","A escola fica perto da minha casa."],
+["far","longe","adv","Is it far?","É longe?"],
+["inside","dentro","adv","Let's go inside.","Vamos entrar."],
+["outside","fora, lá fora","adv","The kids play outside.","As crianças brincam lá fora."],
+["under","embaixo de","prep","The cat is under the bed.","O gato está embaixo da cama."],
+["behind","atrás de","prep","The ball is behind the door.","A bola está atrás da porta."],
+["enough","suficiente, bastante","adj","That's enough!","Já chega!"],
+["each","cada","adj","Each student has a book.","Cada aluno tem um livro."],
+["every","todo, todos os","adj","I study every day.","Eu estudo todo dia."]
+];
+const W={}; WORDS.forEach(w=>W[w[0]]=w);
+const POS={v:"verbo",n:"substantivo",adj:"adjetivo",adv:"advérbio",prep:"preposição",conj:"conjunção",pron:"pronome"};
+const STOPS=[["New York",0],["Pennsylvania",70],["Ohio",380],["Indiana",617],["Illinois",769],["Iowa",932],["Nebraska",1235],["Wyoming",1690],["Utah",2092],["Nevada",2289],["California",2699],["San Francisco",2900]];
+const TRIP=2900;
+
+/* ---------- Storage ---------- */
+const KEY="road-trip-english-v1";
+let storageOk=true;
+function today(){const d=new Date();return Math.floor((d.getTime()-d.getTimezoneOffset()*60000)/86400000)}
+function fresh(){return {v:1,cards:{},xp:0,log:{},settings:{newPerDay:8,rate:0.9,voice:"",autoplay:true}}}
+function load(){
+  try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.cards)return Object.assign(fresh(),o,{settings:Object.assign(fresh().settings,o.settings||{})})}}catch(e){}
+  return fresh();
+}
+function save(){
+  const t=today();Object.keys(S.log).forEach(k=>{if(+k<t-180)delete S.log[k]});
+  try{localStorage.setItem(KEY,JSON.stringify(S));storageOk=true}catch(e){storageOk=false}
+}
+try{localStorage.setItem("__t","1");localStorage.removeItem("__t")}catch(e){storageOk=false}
+let S=load();
+function L(t){t=t??today();return S.log[t]||(S.log[t]={a:0,c:0,n:0,s:0,done:false})}
+
+/* ---------- Voice ---------- */
+const hasTTS=("speechSynthesis" in window)&&("SpeechSynthesisUtterance" in window);
+let voices=[];
+function loadVoices(){if(!hasTTS)return;voices=speechSynthesis.getVoices().filter(v=>/^en[-_]US/i.test(v.lang))}
+if(hasTTS){loadVoices();speechSynthesis.onvoiceschanged=()=>{loadVoices();if(view==="settings")renderSettings()}}
+function pickVoice(){
+  if(!voices.length)return null;
+  if(S.settings.voice){const v=voices.find(v=>v.name===S.settings.voice);if(v)return v}
+  const pref=/(Ava|Samantha|Evan|Nicky|Zoe|Allison|Tom|Susan|Nathan|Joelle|Noelle)/i;
+  const score=v=>(/premium/i.test(v.name)?4:0)+(/enhanced/i.test(v.name)?3:0)+(pref.test(v.name)?2:0)+(v.localService?1:0);
+  return voices.slice().sort((a,b)=>score(b)-score(a))[0];
+}
+function speak(text,rate){
+  if(!hasTTS)return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    const v=pickVoice();if(v){u.voice=v;u.lang=v.lang}else u.lang="en-US";
+    u.rate=rate||S.settings.rate;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ---------- Helpers ---------- */
+const app=document.getElementById("app");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function toks(pt){return pt.split(",").map(s=>s.replace(/\(.*?\)/g,"").trim().toLowerCase()).filter(Boolean)}
+function overlap(a,b){const A=toks(a);return toks(b).some(t=>A.includes(t))}
+function norm(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[’`]/g,"'").replace(/[^a-z' ]/g,"").replace(/\s+/g," ").trim()}
+function lev(a,b){const m=a.length,n=b.length;const d=Array.from({length:m+1},(_,i)=>[i]);for(let j=1;j<=n;j++)d[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[m][n]}
+const shieldSVG=`<svg class="shield" viewBox="0 0 60 64" aria-hidden="true"><defs><clipPath id="shc"><path d="M30 5C21 9 11 9 6 7 4 22 5 43 30 59 55 43 56 22 54 7 49 9 39 9 30 5Z"/></clipPath></defs><path d="M30 1C20 5 9 5 3 3 0 20 1 45 30 63 59 45 60 20 57 3 51 5 40 5 30 1Z" fill="#fff"/><g clip-path="url(#shc)"><rect width="60" height="64" fill="#1B4A95"/><rect width="60" height="18" fill="#B8202E"/></g><text x="30" y="15" text-anchor="middle" font-family="Overpass,sans-serif" font-size="7" font-weight="800" fill="#fff">INTERSTATE</text><text x="30" y="46" text-anchor="middle" font-family="Overpass,sans-serif" font-size="25" font-weight="800" fill="#fff">80</text></svg>`;
+
+function tripInfo(xp){
+  const trips=Math.floor(xp/TRIP), m=xp%TRIP;
+  let i=STOPS.findIndex(s=>s[1]>m); if(i<0)i=STOPS.length-1;
+  return {trips,m,prev:STOPS[i-1]||STOPS[0],next:STOPS[i],left:STOPS[i][1]-m};
+}
+function streak(){
+  const t=today();let d=S.log[t]?.done?t:t-1,n=0;
+  while(S.log[d]?.done){n++;d--}
+  return n;
+}
+function dueList(){
+  const t=today();
+  return WORDS.filter(w=>{const c=S.cards[w[0]];return c&&c.due<=t}).sort((a,b)=>S.cards[a[0]].due-S.cards[b[0]].due);
+}
+function planToday(extraNew){
+  const due=dueList(), reviews=due.slice(0,120);
+  const l=L();
+  let nNew=extraNew!=null?extraNew:(reviews.length>80?0:Math.max(0,S.settings.newPerDay-l.n));
+  const news=WORDS.filter(w=>!S.cards[w[0]]).slice(0,nNew);
+  return {reviews,news,backlog:due.length>80};
+}
+function estMin(p){return Math.max(1,Math.round((p.reviews.length*9+p.news.length*40)/60))}
+function modeFor(c){if(!c||c.ivl<3)return "pt";if(c.ivl<10)return hasTTS?"listen":"pt";return "type"}
+
+/* ---------- Views ---------- */
+let view="home", sess=null, busy=false, flash="";
+
+function renderHome(){
+  view="home";
+  const ti=tripInfo(S.xp), st=streak(), p=planToday(), l=L();
+  const pct=Math.min(100,ti.m/TRIP*100);
+  const ticks=STOPS.slice(1,-1).map(s=>`<i class="tick" style="right:calc(${s[1]/TRIP*100}% - 1px)"></i>`).join("");
+  const doneToday=l.done&&p.reviews.length===0&&p.news.length===0;
+  const nothingLeft=WORDS.every(w=>S.cards[w[0]]);
+  let planTxt;
+  if(doneToday) planTxt="Viagem de hoje concluída. Volte amanhã para continuar a estrada.";
+  else if(!p.reviews.length&&!p.news.length) planTxt=nothingLeft?"Você já viu todas as palavras. Nada para revisar hoje.":"Nada pendente agora.";
+  else planTxt=`Hoje: ${p.reviews.length} ${p.reviews.length===1?"revisão":"revisões"} e ${p.news.length} ${p.news.length===1?"palavra nova":"palavras novas"}. Cerca de ${estMin(p)} min.`;
+  const fl=flash;flash="";
+  app.innerHTML=`
+  ${fl?`<div class="panel" role="status" style="margin:0 0 12px;border-color:var(--green)">${esc(fl)}</div>`:""}
+  ${!storageOk?`<div class="warn">Este navegador não está guardando o progresso. Faça o backup no Painel dos pais ao fim de cada treino.</div>`:""}
+  <section class="sign" aria-label="Próxima parada">
+    <div class="sign-in">
+      <div class="sign-row">${shieldSVG}<div><div class="small">${ti.trips?`Viagem ${ti.trips+1}, rumo a San Francisco`:"Rumo a San Francisco"}</div><div class="small">Próxima parada</div></div></div>
+      <div class="big">${esc(ti.next[0])}</div>
+      <div class="mid">${ti.left} mi</div>
+    </div>
+  </section>
+  <div class="road" role="img" aria-label="${Math.round(pct)}% da viagem percorrida">${ticks}<span class="car" style="right:${pct}%">🚗</span></div>
+  <div class="road-labels"><span>San Francisco</span><span>New York</span></div>
+  <div class="streak"><b>${st>0?"🔥 "+st:"0"}</b><span>${st===1?"dia seguido":"dias seguidos"}</span></div>
+  <p class="plan">${planTxt}${p.backlog&&!doneToday?" Muitas revisões acumuladas: hoje não entram palavras novas.":""}</p>
+  ${doneToday||(!p.reviews.length&&!p.news.length)
+    ? (nothingLeft?"":`<button class="btn btn-plain" id="extra">Aprender mais 5 palavras</button>`)
+    : `<button class="btn btn-go" id="go">${l.a>0?"Continuar a viagem de hoje":"Começar a viagem de hoje"}</button>`}
+  <div class="links"><button class="btn btn-plain" id="panel">Painel dos pais</button><button class="btn btn-plain" id="settings">Ajustes</button></div>
+  ${S.xp===0&&!Object.keys(S.cards).length?`<p class="muted" style="margin-top:16px">Todo dia você revisa as palavras que o app escolher e aprende algumas novas. Cada acerto é uma milha na estrada de Nova York até San Francisco. Ligue o som do iPhone.</p>`:""}
+  `;
+  document.getElementById("go")?.addEventListener("click",()=>startSession());
+  document.getElementById("extra")?.addEventListener("click",()=>startSession(5));
+  document.getElementById("panel").onclick=renderPanel;
+  document.getElementById("settings").onclick=renderSettings;
+}
+
+function startSession(extraNew){
+  if(hasTTS){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u)}catch(e){}}
+  const p=planToday(extraNew);
+  const q=shuffle(p.reviews).map(w=>({k:"quiz",w:w[0]}));
+  const gap=Math.max(2,Math.floor(q.length/Math.max(1,p.news.length)));
+  p.news.forEach((w,i)=>q.splice(Math.min(q.length,i*gap+i),0,{k:"intro",w:w[0]}));
+  sess={queue:q,i:0,a:0,c:0,learned:0,miles:0,failed:new Set(),last:Date.now(),xpStart:S.xp};
+  renderItem();
+}
+
+function tick(){const now=Date.now();const d=Math.min(60,(now-sess.last)/1000);sess.last=now;L().s+=d}
+
+function header(){
+  const total=sess.queue.length, done=sess.i;
+  return `<div class="bar"><button class="x" id="quit">Sair</button><div class="mini-road"><i style="width:${total?done/total*100:0}%"></i></div><span class="count">${Math.min(done+1,total)}/${total}</span></div>`;
+}
+function wordPanel(w,withEn=true){
+  return `<div class="panel">
+    ${withEn?`<h3>${esc(w[0])}</h3>`:""}
+    <div class="pt">${esc(w[1])} <span class="muted">(${POS[w[2]]})</span></div>
+    <div class="audio"><button class="pill-dark" data-say="${esc(w[0])}">🔊 Palavra</button><button class="pill-dark" data-say="${esc(w[0])}" data-slow="1">🐢 Devagar</button></div>
+    <div class="ex"><div class="en">${esc(w[3])}</div><div class="tr">${esc(w[4])}</div>
+    <div class="audio"><button class="pill-dark" data-say="${esc(w[3])}">🔊 Frase</button></div></div>
+    ${w[5]?`<div class="note">⚠️ ${esc(w[5])}</div>`:""}
+  </div>`;
+}
+function bindSay(){
+  app.querySelectorAll("[data-say]").forEach(b=>b.onclick=()=>speak(b.dataset.say,b.dataset.slow?0.6:undefined));
+  const q=document.getElementById("quit");if(q)q.onclick=()=>{tick();finish(false)};
+}
+
+function renderItem(){
+  busy=false;
+  if(sess.i>=sess.queue.length)return finish(true);
+  const it=sess.queue[sess.i], w=W[it.w];
+  view="session";
+  if(it.k==="intro")return renderIntro(it,w);
+  const c=S.cards[it.w];
+  it.mode=it.mode||modeFor(c);
+  if(it.mode==="listen"&&!hasTTS)it.mode="pt";
+  if(it.mode==="pt")renderMC(it,w,"pt");
+  else if(it.mode==="listen")renderMC(it,w,"listen");
+  else renderType(it,w);
+}
+
+function renderIntro(it,w){
+  app.innerHTML=`${header()}
+  <section class="sign"><div class="sign-in">
+    <div class="small">Palavra nova</div>
+    <div class="big">${esc(w[0])}</div>
+    <div class="audio"><button class="pill" data-say="${esc(w[0])}">🔊 Ouvir</button><button class="pill" data-say="${esc(w[0])}" data-slow="1">🐢 Devagar</button></div>
+  </div></section>
+  ${wordPanel(w,false)}
+  <button class="btn btn-go" id="ok" style="margin-top:16px">Entendi</button>`;
+  bindSay();
+  if(S.settings.autoplay)speak(w[0]);
+  document.getElementById("ok").onclick=()=>{
+    tick();
+    const t=today();
+    if(!S.cards[w[0]]){S.cards[w[0]]={st:"learn",ivl:0,ease:2.3,due:t,reps:0,lapses:0,last:t};L().n++}
+    sess.queue.splice(Math.min(sess.queue.length,sess.i+4),0,{k:"quiz",w:w[0],mode:"pt"});
+    sess.i++;save();renderItem();
+  };
+}
+
+function pickDistractors(w,field){
+  const seenFirst=arr=>{const a=shuffle(arr.filter(x=>S.cards[x[0]])),b=shuffle(arr.filter(x=>!S.cards[x[0]]));return a.concat(b)};
+  let pool=WORDS.filter(x=>x[0]!==w[0]&&!overlap(x[1],w[1]));
+  const same=seenFirst(pool.filter(x=>x[2]===w[2])), other=seenFirst(pool.filter(x=>x[2]!==w[2]));
+  const pick=[];
+  for(const x of same.concat(other)){
+    if(pick.length===3)break;
+    if(pick.some(p=>overlap(p[1],x[1])||p[0]===x[0]))continue;
+    pick.push(x);
+  }
+  return shuffle([w,...pick]);
+}
+
+function renderMC(it,w,kind){
+  const opts=pickDistractors(w);
+  const label=x=>kind==="pt"?x[1]:x[0];
+  app.innerHTML=`${header()}
+  <section class="sign"><div class="sign-in" style="text-align:${kind==="listen"?"center":"left"}">
+    ${kind==="pt"
+      ?`<div class="small">O que significa?</div><div class="big">${esc(w[0])}</div><div class="audio"><button class="pill" data-say="${esc(w[0])}">🔊 Ouvir</button><button class="pill" data-say="${esc(w[0])}" data-slow="1">🐢 Devagar</button></div>`
+      :`<div class="small">Qual palavra você ouviu?</div><button class="listen-big" data-say="${esc(w[0])}" aria-label="Ouvir a palavra">🔊</button><button class="pill" data-say="${esc(w[0])}" data-slow="1">🐢 Devagar</button>`}
+  </div></section>
+  <div class="opts" style="margin-top:16px">${opts.map((x,i)=>`<button class="opt" data-i="${i}"><span class="k">${i+1}</span><span>${esc(label(x))}</span></button>`).join("")}</div>
+  <div id="fb"></div>`;
+  bindSay();
+  if(S.settings.autoplay||kind==="listen")speak(w[0]);
+  const btns=[...app.querySelectorAll(".opt")];
+  const choose=i=>{
+    if(busy)return;busy=true;tick();
+    const ok=opts[i][0]===w[0];
+    btns.forEach((b,j)=>{b.disabled=true;if(opts[j][0]===w[0])b.classList.add("right")});
+    if(!ok)btns[i].classList.add("wrong");
+    grade(it,ok);
+    if(ok){
+      if(kind==="listen")speak(w[0]);
+      document.getElementById("fb").innerHTML=`<p class="verdict ok" style="margin-top:14px">Isso! ${kind==="listen"?esc(w[0])+" = "+esc(w[1]):""}</p>`;
+      setTimeout(()=>{sess.i++;renderItem()},kind==="listen"?1300:850);
+    }else{
+      speak(w[0]);
+      document.getElementById("fb").innerHTML=`<div class="panel" style="border-color:var(--red)"><p class="verdict no">Quase. A resposta certa é:</p><h3>${esc(w[0])}</h3><div class="pt">${esc(w[1])}</div>
+      <div class="audio"><button class="pill-dark" data-say="${esc(w[0])}">🔊 Palavra</button></div>
+      <div class="ex"><div class="en">${esc(w[3])}</div><div class="tr">${esc(w[4])}</div><div class="audio"><button class="pill-dark" data-say="${esc(w[3])}">🔊 Frase</button></div></div>
+      ${w[5]?`<div class="note">⚠️ ${esc(w[5])}</div>`:""}</div>
+      <button class="btn btn-go" id="next" style="margin-top:14px">Continuar</button>`;
+      bindSay();
+      const n=document.getElementById("next");n.onclick=()=>{sess.i++;renderItem()};n.focus();
+    }
+  };
+  btns.forEach((b,i)=>b.onclick=()=>choose(i));
+  keyHandler=e=>{const k=+e.key;if(k>=1&&k<=4&&!busy)choose(k-1)};
+}
+
+function renderType(it,w){
+  app.innerHTML=`${header()}
+  <section class="sign"><div class="sign-in">
+    <div class="small">Escreva em inglês</div>
+    <div class="big" style="font-size:34px">${esc(w[1])}</div>
+    <div class="small" style="margin-top:10px;font-weight:400">${esc(w[4])}</div>
+  </div></section>
+  <input class="type" id="inp" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" lang="en" inputmode="text" aria-label="Sua resposta em inglês" placeholder="Digite aqui">
+  <p class="hint">Começa com “${esc(w[0][0])}” e tem ${w[0].replace(/ /g,"").length} letras.</p>
+  <div class="row2"><button class="btn btn-plain" id="idk">Não sei</button><button class="btn btn-go" id="chk">Verificar</button></div>
+  <div id="fb"></div>`;
+  bindSay();
+  const inp=document.getElementById("inp");
+  setTimeout(()=>inp.focus(),50);
+  const check=give=>{
+    if(busy)return;busy=true;tick();
+    const val=norm(inp.value), target=norm(w[0]);
+    const exact=!give&&val===target, near=!give&&!exact&&target.length>=5&&lev(val,target)<=1;
+    const ok=exact||near;
+    grade(it,ok);
+    speak(w[0]);
+    inp.disabled=true;document.getElementById("idk").disabled=true;document.getElementById("chk").disabled=true;
+    if(exact){
+      document.getElementById("fb").innerHTML=`<p class="verdict ok" style="margin-top:14px">Isso! ${esc(w[0])}</p>`;
+      setTimeout(()=>{sess.i++;renderItem()},1200);return;
+    }
+    document.getElementById("fb").innerHTML=`<div class="panel" style="border-color:${ok?"var(--ok)":"var(--red)"}">
+      <p class="verdict ${ok?"ok":"no"}">${near?"Quase perfeito! Confira a grafia:":give?"Tudo bem. A palavra é:":"Não foi dessa vez. A palavra é:"}</p>
+      <h3>${esc(w[0])}</h3><div class="pt">${esc(w[1])}</div>
+      <div class="audio"><button class="pill-dark" data-say="${esc(w[0])}">🔊 Palavra</button><button class="pill-dark" data-say="${esc(w[0])}" data-slow="1">🐢 Devagar</button></div>
+      <div class="ex"><div class="en">${esc(w[3])}</div><div class="tr">${esc(w[4])}</div><div class="audio"><button class="pill-dark" data-say="${esc(w[3])}">🔊 Frase</button></div></div>
+      ${w[5]?`<div class="note">⚠️ ${esc(w[5])}</div>`:""}</div>
+      <button class="btn btn-go" id="next" style="margin-top:14px">Continuar</button>`;
+    bindSay();
+    const n=document.getElementById("next");n.onclick=()=>{sess.i++;renderItem()};n.focus();
+  };
+  document.getElementById("chk").onclick=()=>{if(inp.value.trim())check(false)};
+  document.getElementById("idk").onclick=()=>check(true);
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter"&&inp.value.trim()){e.preventDefault();check(false)}});
+  keyHandler=null;
+}
+
+/* ---------- Spaced repetition ---------- */
+function grade(it,ok){
+  const t=today(), c=S.cards[it.w], l=L();
+  sess.a++;l.a++;
+  if(ok){
+    sess.c++;l.c++;
+    if(c.st==="rev"&&!sess.failed.has(it.w)){
+      let n=Math.max(c.ivl+1,Math.round(c.ivl*c.ease));
+      if(n>4)n=Math.round(n*(0.95+Math.random()*0.1));
+      c.ivl=Math.min(365,n);
+    }else{
+      if(c.reps===0){sess.learned++;addMiles(3)}
+      c.ivl=1;
+    }
+    c.st="rev";c.due=t+c.ivl;c.reps++;c.last=t;addMiles(1);
+  }else{
+    if(c.st==="rev"){c.lapses++;c.ease=Math.max(1.3,c.ease-0.2)}
+    c.st="learn";c.ivl=0;c.due=t;c.last=t;
+    sess.failed.add(it.w);
+    sess.queue.splice(Math.min(sess.queue.length,sess.i+4),0,{k:"quiz",w:it.w,mode:it.mode});
+  }
+  save();
+}
+function addMiles(n){S.xp+=n;sess.miles+=n}
+
+function finish(completed){
+  keyHandler=null;
+  if(hasTTS)speechSynthesis.cancel();
+  const l=L();
+  const planned=sess.queue.length>0;
+  if(completed&&planned){addMiles(20);l.done=true}
+  save();
+  const before=tripInfo(sess.xpStart), after=tripInfo(S.xp);
+  const crossed=(after.trips>before.trips)||(after.next[0]!==before.next[0]);
+  const reached=after.trips>before.trips?"San Francisco":after.prev[0];
+  if(!completed||!planned){renderHome();return}
+  view="end";
+  const acc=sess.a?Math.round(sess.c/sess.a*100):0;
+  app.innerHTML=`
+  <section class="sign"><div class="sign-in">
+    <div class="small">${crossed?"Bem-vindo a":"Viagem de hoje concluída"}</div>
+    <div class="big">${crossed?esc(reached):"+"+sess.miles+" mi"}</div>
+    ${crossed?`<div class="mid">+${sess.miles} mi hoje</div>`:""}
+  </div></section>
+  <div class="stats" style="margin-top:16px">
+    <div class="stat"><b>${acc}%</b><span>de acertos</span></div>
+    <div class="stat"><b>${sess.learned}</b><span>${sess.learned===1?"palavra nova aprendida":"palavras novas aprendidas"}</span></div>
+    <div class="stat"><b>🔥 ${streak()}</b><span>dias seguidos</span></div>
+    <div class="stat"><b>${after.left}</b><span>mi até ${esc(after.next[0])}</span></div>
+  </div>
+  <button class="btn btn-go" id="home" style="margin-top:18px">Voltar ao início</button>`;
+  document.getElementById("home").onclick=renderHome;
+}
+
+/* ---------- Painel dos pais ---------- */
+function renderPanel(){
+  view="panel";
+  const t=today(), cards=Object.entries(S.cards);
+  const learned=cards.filter(([,c])=>c.st==="rev"||c.reps>0).length;
+  const mastered=cards.filter(([,c])=>c.ivl>=21).length;
+  let a=0,c=0,s=0,days=0;
+  for(let d=t-6;d<=t;d++){const l=S.log[d];if(l){a+=l.a;c+=l.c;s+=l.s;if(l.done)days++}}
+  const heat=[];for(let d=t-27;d<=t;d++){const l=S.log[d];heat.push(`<i class="${l?.done?"d":(l?.a?"p":"")}" title="${new Date(d*86400000).toISOString().slice(0,10)}"></i>`)}
+  const hard=cards.filter(([,c])=>c.lapses>0).sort((x,y)=>y[1].lapses-x[1].lapses).slice(0,6);
+  app.innerHTML=`
+  <div class="page-h"><h2>Painel dos pais</h2><button class="btn btn-plain" id="back" style="width:auto;padding:8px 14px;font-size:15px">Voltar</button></div>
+  <div class="stats">
+    <div class="stat"><b>${learned}</b><span>palavras aprendidas de ${WORDS.length}</span></div>
+    <div class="stat"><b>${mastered}</b><span>dominadas (revisão a cada 3+ semanas)</span></div>
+    <div class="stat"><b>${a?Math.round(c/a*100)+"%":"–"}</b><span>acertos nos últimos 7 dias</span></div>
+    <div class="stat"><b>${Math.round(s/60)} min</b><span>estudados nos últimos 7 dias (${days} de 7 dias completos)</span></div>
+  </div>
+  <div class="panel"><h3>Últimos 28 dias</h3>
+    <div class="heat">${heat.join("")}</div>
+    <div class="legend"><span><i style="background:var(--green)"></i>completo</span><span><i style="background:color-mix(in srgb,var(--green) 40%,var(--surface))"></i>incompleto</span><span><i style="background:var(--line)"></i>não estudou</span></div>
+    <p class="muted" style="margin-top:8px">🔥 ${streak()} dias seguidos. O último quadrado é hoje.</p>
+  </div>
+  <div class="panel"><h3>Palavras que mais erra</h3>
+    ${hard.length?`<ul class="hard">${hard.map(([k,c])=>`<li>${esc(k)} <span>${esc(W[k]?.[1]||"")}, ${c.lapses}x</span></li>`).join("")}</ul>`:`<p class="muted" style="margin-top:6px">Nenhum esquecimento registrado ainda.</p>`}
+  </div>
+  <div class="panel"><h3>Backup do progresso</h3>
+    <p class="muted" style="margin-top:4px">O progresso fica guardado só neste aparelho e neste navegador. Guarde um código de backup de vez em quando (por exemplo, mande para você no WhatsApp).</p>
+    <button class="btn btn-plain" id="mk" style="margin-top:10px">Gerar código de backup</button>
+    <textarea id="bk" readonly style="display:none" aria-label="Código de backup"></textarea>
+    <p class="muted" id="bkmsg" style="margin-top:6px"></p>
+    <textarea id="rs" placeholder="Cole aqui um código de backup para restaurar" aria-label="Colar código de backup"></textarea>
+    <button class="btn btn-plain" id="restore" style="margin-top:10px">Restaurar backup</button>
+    <p class="muted" id="rsmsg" style="margin-top:8px"></p>
+  </div>`;
+  document.getElementById("back").onclick=renderHome;
+  document.getElementById("mk").onclick=async()=>{
+    const code=btoa(unescape(encodeURIComponent(JSON.stringify(S))));
+    const ta=document.getElementById("bk");ta.style.display="block";ta.value=code;ta.focus();ta.select();
+    let msg="Código gerado. Toque no campo, selecione tudo e copie.";
+    try{await navigator.clipboard.writeText(code);msg="Código copiado. Cole e guarde em um lugar seguro."}catch(e){}
+    document.getElementById("bkmsg").textContent=msg;
+  };
+  let pending=null;
+  const rbtn=document.getElementById("restore"), rmsg=document.getElementById("rsmsg");
+  rbtn.onclick=()=>{
+    if(pending){
+      S=Object.assign(fresh(),pending,{settings:Object.assign(fresh().settings,pending.settings||{})});
+      save();flash="Backup restaurado.";renderHome();return;
+    }
+    const raw=document.getElementById("rs").value.trim().replace(/\s+/g,"");
+    if(!raw){rmsg.textContent="Cole o código de backup no campo acima.";return}
+    try{
+      const o=JSON.parse(decodeURIComponent(escape(atob(raw))));
+      if(!o||typeof o.cards!=="object")throw 0;
+      pending=o;
+      rbtn.textContent="Toque de novo para substituir o progresso atual";
+      rbtn.style.background="var(--green)";rbtn.style.color="#fff";
+      rmsg.textContent=`Backup válido com ${Object.keys(o.cards).length} palavras. O progresso atual deste aparelho será substituído.`;
+    }catch(e){rmsg.textContent="Código inválido. Confira se colou o código inteiro."}
+  };
+}
+
+/* ---------- Ajustes ---------- */
+function renderSettings(){
+  view="settings";
+  const st=S.settings, cur=pickVoice();
+  app.innerHTML=`
+  <div class="page-h"><h2>Ajustes</h2><button class="btn btn-plain" id="back" style="width:auto;padding:8px 14px;font-size:15px">Voltar</button></div>
+  <div class="panel"><h3>Palavras novas por dia</h3>
+    <div class="seg" id="npd">${[5,8,10,12].map(n=>`<button class="${st.newPerDay===n?"on":""}" data-n="${n}">${n}</button>`).join("")}</div>
+    <p class="muted" style="margin-top:8px">Com 8 por dia, o treino fica em 12 a 15 minutos depois de algumas semanas. Mais que isso faz as revisões crescerem rápido.</p>
+  </div>
+  <div class="panel"><h3>Voz</h3>
+    ${hasTTS?`
+    <select id="voice" aria-label="Escolher voz">
+      <option value="">Automática${cur?" ("+esc(cur.name)+")":""}</option>
+      ${voices.map(v=>`<option value="${esc(v.name)}" ${st.voice===v.name?"selected":""}>${esc(v.name)}</option>`).join("")}
+    </select>
+    <div class="seg" id="rate"><button class="${st.rate>=0.9?"on":""}" data-r="0.9">Normal</button><button class="${st.rate<0.9?"on":""}" data-r="0.75">Mais devagar</button></div>
+    <label class="toggle" style="margin-top:12px"><span>Tocar o áudio automaticamente</span><input type="checkbox" id="auto" ${st.autoplay?"checked":""}></label>
+    <button class="btn btn-plain" id="test" style="margin-top:12px">🔊 Testar voz</button>
+    ${voices.length?"":`<p class="muted" style="margin-top:8px">Nenhuma voz de inglês americano encontrada neste aparelho. O áudio pode sair com sotaque errado.</p>`}
+    <p class="muted" style="margin-top:10px">No iPhone, a voz fica bem mais natural se você baixar uma voz Premium: Ajustes, Acessibilidade, Conteúdo Falado, Vozes, Inglês, e baixe “Ava (Premium)” ou “Evan (Aprimorada)”. Depois feche e abra esta página.</p>`
+    :`<p class="muted">Este navegador não tem síntese de voz. Os exercícios de escuta ficam desligados.</p>`}
+  </div>
+  <div class="panel"><h3>Recomeçar do zero</h3>
+    <p class="muted" style="margin-top:4px">Apaga todo o progresso deste aparelho.</p>
+    <button class="btn btn-plain" id="reset" style="margin-top:10px;border-color:var(--red);color:var(--red)">Apagar progresso</button>
+    <p class="muted" id="resetmsg" style="margin-top:8px"></p>
+  </div>`;
+  document.getElementById("back").onclick=renderHome;
+  app.querySelectorAll("#npd button").forEach(b=>b.onclick=()=>{st.newPerDay=+b.dataset.n;save();renderSettings()});
+  if(hasTTS){
+    document.getElementById("voice").onchange=e=>{st.voice=e.target.value;save();speak("Hello! Let's learn English.")};
+    app.querySelectorAll("#rate button").forEach(b=>b.onclick=()=>{st.rate=+b.dataset.r;save();renderSettings();speak("Hello! Let's learn English.")});
+    document.getElementById("auto").onchange=e=>{st.autoplay=e.target.checked;save()};
+    document.getElementById("test").onclick=()=>speak("Hello! Let's learn English together.");
+  }
+  let armed=false,armTimer=null;
+  const rb=document.getElementById("reset");
+  rb.onclick=()=>{
+    if(!armed){
+      armed=true;
+      rb.textContent="Toque de novo para confirmar";
+      rb.style.background="var(--red)";rb.style.color="#fff";
+      document.getElementById("resetmsg").textContent="Isso apaga palavras, milhas e dias seguidos deste aparelho e não pode ser desfeito.";
+      armTimer=setTimeout(()=>{armed=false;rb.textContent="Apagar progresso";rb.style.background="";rb.style.color="var(--red)";document.getElementById("resetmsg").textContent=""},6000);
+      return;
+    }
+    clearTimeout(armTimer);
+    S=fresh();
+    try{localStorage.removeItem(KEY)}catch(e){}
+    save();
+    flash="Progresso apagado. A viagem recomeça em New York.";
+    renderHome();
+  };
+}
+
+/* ---------- Keyboard ---------- */
+let keyHandler=null;
+document.addEventListener("keydown",e=>{
+  if(view!=="session")return;
+  if(e.key==="Enter"){const n=document.getElementById("next");if(n){e.preventDefault();n.click();return}const ok=document.getElementById("ok");if(ok){e.preventDefault();ok.click();return}}
+  if(keyHandler)keyHandler(e);
+});
+
+renderHome();
+</script>
+</body>
+</html>
